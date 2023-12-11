@@ -106,8 +106,8 @@ export async function sendEmail(auth) {
     const mailOptions = {
       from: process.env.EMAIL,
       to: process.env.EMAIL,
-      subject: "Sending Email using Node.js",
-      text: "That was easy!",
+      subject: req.data.subject,
+      text: req.data.text,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
