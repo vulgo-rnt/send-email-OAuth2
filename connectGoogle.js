@@ -52,3 +52,27 @@ export async function waitForGoogleCallback(webServer) {
     });
   });
 }
+
+export async function requestGoogleForAccessTokens(
+  OAuthClient,
+  authorizationToken
+) {
+  return new Promise((resolve, reject) => {
+    OAuthClient.getToken(authorizationToken, (error, tokens) => {
+      if (error) {
+        return reject(error);
+      }
+
+      console.log("Access tokens received!");
+
+      OAuthClient.setCredentials(tokens);
+      resolve();
+    });
+  });
+}
+
+export function setGlobalGoogleAuthentication(OAuthClient) {
+  google.options({
+    auth: OAuthClient,
+  });
+}
