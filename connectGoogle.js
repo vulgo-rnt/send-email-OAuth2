@@ -1,9 +1,11 @@
 import express from "express";
 import { google } from "googleapis";
-import credentials from "./credentials/auth.json" assert { type: "json" };
 import nodemailer from "nodemailer";
+import "dotenv/config";
 
 const OAuth2 = google.auth.OAuth2;
+const stringCredentials = process.env.AUTH;
+const credentials = JSON.parse(stringCredentials);
 
 export async function startWebServer() {
   return new Promise((resolve, reject) => {
@@ -11,7 +13,7 @@ export async function startWebServer() {
     const app = express();
 
     const server = app.listen(port, () => {
-      console.log(`Listening on http://localhost:${port}`);
+      console.log(`>Listening on http://localhost:${port}`);
 
       resolve({
         app,
@@ -37,17 +39,15 @@ export function requestUserConsent(OAuthClient) {
     scope: ["https://mail.google.com/"],
   });
 
-  console.log(`Please give your consent: ${consentUrl}`);
+  console.log(`>Please give your consent: ${consentUrl}`);
 }
 
 export async function waitForGoogleCallback(webServer) {
   return new Promise((resolve, reject) => {
-    console.log("Waiting for user consent...");
+    console.log(">Waiting for user consent...");
 
     webServer.app.get("/auth", (req, res) => {
       const authCode = req.query.code;
-      console.log(`Consent given: ${authCode}`);
-
       res.send("<h1>Thank you!</h1><p>Now close this tab.</p>");
       resolve(authCode);
     });
@@ -64,7 +64,7 @@ export async function requestGoogleForAccessTokens(
         return reject(error);
       }
 
-      console.log("Access tokens received!");
+      console.log(">Access tokens received!");
 
       OAuthClient.setCredentials(tokens);
       resolve();
@@ -90,13 +90,12 @@ export async function sendEmail(auth) {
   const app = express();
   const port = 3000;
 
-  console.log(auth);
   app.post("/send", (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         type: "OAuth2",
-        user: "rtoniolo4@gmail.com",
+        user: process.env.EMAIL,
         clientId: auth._clientId,
         clientSecret: auth._clientSecret,
         refreshToken: auth.credentials.refresh_token,
@@ -105,8 +104,8 @@ export async function sendEmail(auth) {
     });
 
     const mailOptions = {
-      from: "rtoniolo4@gmail.com",
-      to: "rtoniolo4@gmail.com",
+      from: process.env.EMAIL,
+      to: process.env.EMAIL,
       subject: "Sending Email using Node.js",
       text: "That was easy!",
     };
@@ -115,12 +114,12 @@ export async function sendEmail(auth) {
       if (error) {
         console.log(error);
       } else {
-        console.log("Email sent: " + info.response);
+        console.log(">Email sent: " + info.response);
       }
     });
   });
 
   app.listen(port, () => {
-    console.log(`Listening on http://localhost:${port}`);
+    console.log(`>Listening on http://localhost:${port}`);
   });
 }
