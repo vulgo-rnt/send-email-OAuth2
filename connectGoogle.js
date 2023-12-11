@@ -1,6 +1,7 @@
 import express from "express";
 import { google } from "googleapis";
 import credentials from "./credentials/auth.json" assert { type: "json" };
+import nodemailer from "nodemailer";
 
 const OAuth2 = google.auth.OAuth2;
 
@@ -33,7 +34,7 @@ export async function createOAuthClient() {
 export function requestUserConsent(OAuthClient) {
   const consentUrl = OAuthClient.generateAuthUrl({
     access_type: "offline",
-    scope: ["https://www.googleapis.com/auth/gmail.send"],
+    scope: ["https://mail.google.com/"],
   });
 
   console.log(`Please give your consent: ${consentUrl}`);
@@ -74,5 +75,52 @@ export async function requestGoogleForAccessTokens(
 export function setGlobalGoogleAuthentication(OAuthClient) {
   google.options({
     auth: OAuthClient,
+  });
+}
+
+export async function stopWebServer(webServer) {
+  return new Promise((resolve, reject) => {
+    webServer.server.close(() => {
+      resolve();
+    });
+  });
+}
+
+export async function sendEmail(auth) {
+  const app = express();
+  const port = 3000;
+
+  console.log(auth);
+  app.post("/send", (req, res) => {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: "rtoniolo4@gmail.com",
+        clientId: auth._clientId,
+        clientSecret: auth._clientSecret,
+        refreshToken: auth.credentials.refresh_token,
+        accessToken: auth.credentials.access_token,
+      },
+    });
+
+    const mailOptions = {
+      from: "rtoniolo4@gmail.com",
+      to: "rtoniolo4@gmail.com",
+      subject: "Sending Email using Node.js",
+      text: "That was easy!",
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+  });
+
+  app.listen(port, () => {
+    console.log(`Listening on http://localhost:${port}`);
   });
 }
