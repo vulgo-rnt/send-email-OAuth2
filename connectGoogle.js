@@ -12,6 +12,8 @@ export async function startWebServer() {
     const port = 3000;
     const app = express();
 
+    app.use(express.json());
+
     app.get("/", (req, res) => {
       res.send(
         "<h1>Is back-end redirect for consent <a href='/consent'>click here</a></h1>"
@@ -91,11 +93,13 @@ export function setGlobalGoogleAuthentication(OAuthClient) {
 export async function setPostEmailWebServer(webServer, auth) {
   return new Promise((resolve, reject) => {
     webServer.app.post("/send", (req, res) => {
+      const { email, subject, text } = req.body;
+
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
           type: "OAuth2",
-          user: req.data.email,
+          user: process.env.EMAIL,
           clientId: auth._clientId,
           clientSecret: auth._clientSecret,
           refreshToken: auth.credentials.refresh_token,
@@ -106,8 +110,8 @@ export async function setPostEmailWebServer(webServer, auth) {
       const mailOptions = {
         from: process.env.EMAIL,
         to: process.env.EMAIL,
-        subject: req.data.subject,
-        text: req.data.text,
+        subject: subject,
+        text: `Email-received: ${email}, Message: ${text}`,
       };
 
       transporter.sendMail(mailOptions, (error, info) => {
