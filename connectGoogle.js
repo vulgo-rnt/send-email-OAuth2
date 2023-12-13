@@ -78,51 +78,39 @@ export function setGlobalGoogleAuthentication(OAuthClient) {
   });
 }
 
-export async function stopWebServer(webServer) {
+export async function setPostEmailWebServer(webServer, auth) {
   return new Promise((resolve, reject) => {
-    webServer.server.close(() => {
-      resolve();
+    webServer.app.get("/", (req, res) => {
+      res.send("Hello is Back-End");
     });
-  });
-}
+    webServer.app.post("/send", (req, res) => {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          type: "OAuth2",
+          user: process.env.EMAIL,
+          clientId: auth._clientId,
+          clientSecret: auth._clientSecret,
+          refreshToken: auth.credentials.refresh_token,
+          accessToken: auth.credentials.access_token,
+        },
+      });
 
-export async function sendEmail(auth) {
-  const app = express();
-  const port = 3000;
+      const mailOptions = {
+        from: process.env.EMAIL,
+        to: process.env.EMAIL,
+        subject: req.data.subject,
+        text: req.data.text,
+      };
 
-  app.get('/',(req,res)=>{
-    res.send('Enter in Console')
-  })
-  app.post("/send", (req, res) => {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: process.env.EMAIL,
-        clientId: auth._clientId,
-        clientSecret: auth._clientSecret,
-        refreshToken: auth.credentials.refresh_token,
-        accessToken: auth.credentials.access_token,
-      },
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log(">Email sent: " + info.response);
+        }
+      });
     });
-
-    const mailOptions = {
-      from: process.env.EMAIL,
-      to: process.env.EMAIL,
-      subject: req.data.subject,
-      text: req.data.text,
-    };
-
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(">Email sent: " + info.response);
-      }
-    });
-  });
-
-  app.listen(port, () => {
-    console.log(`>Listening on http://localhost:${port}`);
+    resolve();
   });
 }

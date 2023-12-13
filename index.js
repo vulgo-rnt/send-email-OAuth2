@@ -4,9 +4,8 @@ import {
   requestUserConsent,
   waitForGoogleCallback,
   requestGoogleForAccessTokens,
-  stopWebServer,
-  sendEmail,
   setGlobalGoogleAuthentication,
+  setPostEmailWebServer,
 } from "./connectGoogle.js";
 
 async function init() {
@@ -16,8 +15,7 @@ async function init() {
   const authorizationToken = await waitForGoogleCallback(webServer);
   requestGoogleForAccessTokens(OAuthClient, authorizationToken);
   setGlobalGoogleAuthentication(OAuthClient);
-  await stopWebServer(webServer);
-  await sendEmail(OAuthClient);
+  await setPostEmailWebServer(webServer, OAuthClient);
 }
 
 init();
