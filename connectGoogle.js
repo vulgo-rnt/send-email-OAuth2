@@ -12,6 +12,10 @@ export async function startWebServer() {
     const port = 3000;
     const app = express();
 
+    app.get("/", (req, res) => {
+      res.send("Hello is Back-End");
+    });
+
     const server = app.listen(port, () => {
       console.log(`>Listening on http://localhost:${port}`);
 
@@ -80,9 +84,6 @@ export function setGlobalGoogleAuthentication(OAuthClient) {
 
 export async function setPostEmailWebServer(webServer, auth) {
   return new Promise((resolve, reject) => {
-    webServer.app.get("/", (req, res) => {
-      res.send("Hello is Back-End");
-    });
     webServer.app.post("/send", (req, res) => {
       const transporter = nodemailer.createTransport({
         service: "gmail",
