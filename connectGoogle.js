@@ -90,6 +90,9 @@ export async function sendEmail(auth) {
   const app = express();
   const port = 3000;
 
+  app.get('/',(req,res)=>{
+    res.send('Enter in Console')
+  })
   app.post("/send", (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
