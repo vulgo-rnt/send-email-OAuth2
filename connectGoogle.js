@@ -14,12 +14,6 @@ export async function startWebServer() {
 
     app.use(express.json());
 
-    app.get("/", (req, res) => {
-      res.send(
-        "<h1>Is back-end redirect for consent <a href='/consent'>click here</a></h1>"
-      );
-    });
-
     const server = app.listen(port, () => {
       console.log(`>Listening on http://localhost:${port}`);
 
@@ -46,12 +40,7 @@ export function requestUserConsent(OAuthClient, webServer) {
     access_type: "offline",
     scope: ["https://mail.google.com/"],
   });
-
-  webServer.app.get("/consent", (req, res) => {
-    res.send(
-      `<h1>Please give your consent: <a href='${consentUrl}'>Click Here</a></h1>`
-    );
-  });
+  console.log(`>Please give your consent: ${consentUrl}`);
 }
 
 export async function waitForGoogleCallback(webServer) {
