@@ -4,6 +4,10 @@
     {
       "src": "index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "now-sapper"
     }
   ],
   "routes": [
@@ -11,7 +15,5 @@
       "src": "/(.*)",
       "dest": "index.js"
     }
-  ],
-
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+  ]
 }
