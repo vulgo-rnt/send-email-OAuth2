@@ -43,7 +43,11 @@ export function requestUserConsent(OAuthClient) {
     scope: ["https://mail.google.com/"],
   });
 
-  console.log(`>Please give your consent: ${consentUrl}`);
+  webServer.app.get("/consent", (req, res) => {
+    res.send(
+      `<h1>Please give your consent: <a href='${consentUrl}'>Click Here</a></h1>`
+    );
+  });
 }
 
 export async function waitForGoogleCallback(webServer) {
@@ -89,7 +93,7 @@ export async function setPostEmailWebServer(webServer, auth) {
         service: "gmail",
         auth: {
           type: "OAuth2",
-          user: process.env.EMAIL,
+          user: req.data.email,
           clientId: auth._clientId,
           clientSecret: auth._clientSecret,
           refreshToken: auth.credentials.refresh_token,
@@ -110,8 +114,8 @@ export async function setPostEmailWebServer(webServer, auth) {
         } else {
           console.log(">Email sent: " + info.response);
         }
+        resolve();
       });
     });
-    resolve();
   });
 }
