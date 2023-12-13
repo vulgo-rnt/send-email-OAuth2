@@ -13,7 +13,9 @@ export async function startWebServer() {
     const app = express();
 
     app.get("/", (req, res) => {
-      res.send("Hello is Back-End");
+      res.send(
+        "<h1>Is back-end redirect for consent <a href='/consent'>click here</a></h1>"
+      );
     });
 
     const server = app.listen(port, () => {
