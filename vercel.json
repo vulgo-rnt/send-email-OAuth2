@@ -10,18 +10,6 @@
     {
       "src": "/(.*)",
       "dest": "index.js"
-    },
-    {
-      "src": "/consent",
-      "dest": "index.js"
-    },
-    {
-      "src": "/auth",
-      "dest": "index.js"
-    },
-    {
-      "src": "/send",
-      "dest": "index.js"
     }
   ]
 }
