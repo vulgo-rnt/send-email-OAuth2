@@ -11,7 +11,7 @@ import {
 async function init() {
   const webServer = await startWebServer();
   const OAuthClient = await createOAuthClient();
-  requestUserConsent(OAuthClient);
+  requestUserConsent(OAuthClient, webServer);
   const authorizationToken = await waitForGoogleCallback(webServer);
   requestGoogleForAccessTokens(OAuthClient, authorizationToken);
   setGlobalGoogleAuthentication(OAuthClient);

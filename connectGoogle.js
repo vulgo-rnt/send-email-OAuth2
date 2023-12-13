@@ -37,7 +37,7 @@ export async function createOAuthClient() {
   return OAuthClient;
 }
 
-export function requestUserConsent(OAuthClient) {
+export function requestUserConsent(OAuthClient, webServer) {
   const consentUrl = OAuthClient.generateAuthUrl({
     access_type: "offline",
     scope: ["https://mail.google.com/"],
